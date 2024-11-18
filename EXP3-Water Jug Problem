@@ -1,0 +1,48 @@
+from collections import deque
+
+def water_jug_problem(capacity1, capacity2, target):
+    # State is represented as (amount in jug1, amount in jug2)
+    initial_state = (0, 0)
+    visited = set()
+    queue = deque([(initial_state, [])])  # (current state, path to reach it)
+
+    while queue:
+        (jug1, jug2), path = queue.popleft()
+        
+        # Check if we have reached the target
+        if jug1 == target:
+            return path + [(jug1, jug2)]
+
+        # If this state has already been visited, skip it
+        if (jug1, jug2) in visited:
+            continue
+        visited.add((jug1, jug2))
+
+        # Possible actions
+        actions = [
+            (capacity1, jug2),  # Fill jug1
+            (jug1, capacity2),  # Fill jug2
+            (0, jug2),          # Empty jug1
+            (jug1, 0),          # Empty jug2
+            (min(jug1 + jug2, capacity1), jug1 + jug2 - min(jug1 + jug2, capacity1)),  # Pour jug2 into jug1
+            (jug1 - min(jug1 + jug2, capacity2), min(jug1 + jug2, capacity2))  # Pour jug1 into jug2
+        ]
+
+        for new_jug1, new_jug2 in actions:
+            queue.append(((new_jug1, new_jug2), path + [(jug1, jug2)]))
+
+    return None  # No solution found
+
+if __name__ == "__main__":
+    capacity1 = 4  # Capacity of the 4-gallon jug
+    capacity2 = 3  # Capacity of the 3-gallon jug
+    target = 2     # Target amount of water in the 4-gallon jug
+
+    solution = water_jug_problem(capacity1, capacity2, target)
+
+    if solution:
+        print("Steps to measure 2 gallons in the 4-gallon jug:")
+        for step in solution:
+            print(f"Jug1: {step[0]} gallons, Jug2: {step[1]} gallons")
+    else:
+        print("No solution found.")
